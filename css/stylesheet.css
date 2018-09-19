@@ -36,3 +36,24 @@ html, body {
     top:5vh;
     left:5vh;
 }
+.tetrominoe-I {
+    background-color:#2ae0ed;
+}
+.tetrominoe-O {
+    background-color:#fce93c;
+}
+.tetrominoe-T {
+    background-color:#b539ba;
+}
+.tetrominoe-S {
+    background-color:#38bc31;
+}
+.tetrominoe-Z {
+    background-color:#e04d1d;
+}
+.tetrominoe-J {
+    background-color:#4773e0;
+}
+.tetrominoe-L {
+    background-color:#ed911a;
+}
