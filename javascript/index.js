@@ -4,6 +4,13 @@ $(document).ready(function() {
     gameData = generateGameData();
     generateTetrominoe();
     gameTick();
+
+    // $('html').keypress(function(key){
+    //   switch (key.keyCode) {
+    //     case 13: if (gameData.activeTetrominoe){return}else{generateTetrominoe()} break;
+    //     default: console.log('invalid key');
+    //   }
+    // })
 });
 
 var gameTick = function() {
@@ -14,7 +21,8 @@ var gameTick = function() {
 }
 
 var gameUpdate = function() {
-  if (Date.now() - gameData.lastTick > 250) {
+  if (Date.now() - gameData.lastTick > gameData.tickrate) {
+    console.log('tick')
     gameData.lastTick = Date.now();
     if (gameData.activeTetrominoe) {
       moveTetrominoe();
@@ -33,29 +41,30 @@ var generateGameArea = function() {
 }
 
 var moveTetrominoe = function() {
+  console.log('moving')
   var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t'];
+  var ending = false;
   for (let i = 0; i < gameData.activeTiles.length; i++) {
-    console.log(gameData.activeTiles[i].Y, alphabet[i+1])
-    if (gameData.activeTiles[i].Y === gameData.staticTiles[findStaticTiles(alphabet[findFirstIndexFromArray(alphabet,gameData.activeTiles[i].Y)+1])].Y || gameData.activeTiles[i].Y === 't'){
+    if (gameData.activeTiles[i].Y === findStaticTiles(alphabet[findFirstIndexFromArray(alphabet,gameData.activeTiles[i].Y)+1]) || gameData.activeTiles[i].Y === 't'){
       for (let u = 0; u < gameData.activeTiles.length; i++) {
-        $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('static');
-        $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('active');
+        $('#' + String(gameData.activeTiles[u].X) + String(gameData.activeTiles[u].Y)).addClass('static');
+        $('#' + String(gameData.activeTiles[u].X) + String(gameData.activeTiles[u].Y)).removeClass('active');
       }
         gameData.activeTiles = [{Y:null,X:null},{Y:null,X:null},{Y:null,X:null},{Y:null,X:null}];
         gameData.activeTetrominoe = false;
-        return;
+        ending = true;
     }
   }
-  for (let i = 0; i < gameData.activeTiles.length; i++) {
-    $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
-    $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('active');
-    console.log('removed classes');
-  }
-  for (let i = 0; i < gameData.activeTiles.length; i++) {
-    console.log('added classes');
-    gameData.activeTiles[i].Y = alphabet[findFirstIndexFromArray(alphabet,gameData.activeTiles[i].Y) + 1];
-    $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
-    $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('active');
+  if (!ending) {
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('active');
+    }
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      gameData.activeTiles[i].Y = alphabet[findFirstIndexFromArray(alphabet,gameData.activeTiles[i].Y) + 1];
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('active');
+    }
   }
 }
 
@@ -76,6 +85,7 @@ var findStaticTiles = function (Y) {
 }
 
 var generateTetrominoe = function() {
+    console.log('generating')
     gameData.activeTetrominoeShape = Math.floor(Math.random()*7)
     var currentTetrominoe = gameData.tetrominoeConfigurations[gameData.activeTetrominoeShape];
     var currentTile = currentTetrominoe[0]
@@ -111,7 +121,7 @@ generateGameData = function() {
     activeTiles: [{Y:null,X:null},{Y:null,X:null},{Y:null,X:null},{Y:null,X:null}],
     staticTiles: staticTiles,
 
-
+    tickrate:250,
     lastTick: 0
   }
 }
