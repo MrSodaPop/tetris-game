@@ -18,9 +18,10 @@ var gameUpdate = function() {
 
 
 var generateGameArea = function() {
+  var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t'];
   for (let u = 0; u < 20; u++) {
     for (let i = 0; i < 10; i++) {
-      $('.game-area').append('<div class=\'game-tile X-' + i + ' Y-' + u + '\'></div>')
+      $('.game-area').append('<div id=\'' + String(i) + alphabet[u] + '\' class=\'game-tile X-' + i + ' Y-' + u + '\'></div>')
     }
   }
 }
@@ -28,18 +29,19 @@ var generateGameArea = function() {
 var generateTetrominoe = function() {
     var currentTetrominoe = gameData.tetrominoeConfigurations[(Math.floor(Math.random()*7))];
     var currentTile = currentTetrominoe[0]
+    console.log(currentTetrominoe);
     for (let i = 0; i < 4; i++) {
-      currentTile = currentTetrominoe[i]
+      currentTile = parseInt(currentTetrominoe[i])
       if (currentTile > 4) {
-        gameData.activeTiles[i].Y = currentTile = 1;
+        gameData.activeTiles[i].Y = 'b';
         gameData.activeTiles[i].X = currentTile - 2;
       }
       else {
-        gameData.activeTiles[i].Y = currentTile = 0;
+        gameData.activeTiles[i].Y = 'a';
         gameData.activeTiles[i].X = currentTile + 2;
       }
-      console.log('Attempting recolor')
-      $('.X-' + gameData.activeTiles[i].X + ' .Y-' + gameData.activeTiles[i].Y).css('background-color','black');
+      console.log('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y))
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).css('background-color','black');
     }
 }
 
