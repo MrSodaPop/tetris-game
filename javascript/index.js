@@ -8,6 +8,8 @@ $(document).ready(function() {
     $('html').keypress(function(key){
       switch (key.keyCode) {
         case 13: if (gameData.activeTetrominoe){return}else{generateTetrominoe()} break;
+        case 97: moveTetrominoe('left'); break;
+        case 100: moveTetrominoe('right'); break;
         default: console.log('invalid key');
       }
     })
@@ -28,7 +30,7 @@ var gameUpdate = function() {
   if (Date.now() - gameData.lastTick > gameData.tickrate) {
     gameData.lastTick = Date.now();
     if (gameData.activeTetrominoe) {
-      moveTetrominoe();
+      fallTetrominoe();
     }
     
   }
@@ -44,17 +46,48 @@ var generateGameArea = function() {
   }
 }
 
-var moveTetrominoe = function() {
+var moveTetrominoe = function(direction) {
+  if (direction === 'right') {
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      if (findStaticTiles(gameData.activeTiles[i].X + 1,gameData.activeTiles[i].Y) || gameData.activeTiles[i].X === 9) {
+        return;
+      }
+    }
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).removeClass('active')
+      $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).removeClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
+      gameData.activeTiles[i].X++;
+      $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('active')
+      $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
+    }
+  }
+  else {
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      if (findStaticTiles(gameData.activeTiles[i].X - 1,gameData.activeTiles[i].Y) || gameData.activeTiles[i].X === 0) {
+        return;
+      }
+    }
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).removeClass('active')
+        $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).removeClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
+        gameData.activeTiles[i].X--;
+        $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('active')
+        $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
+    }
+  }
+}
+
+var fallTetrominoe = function() {
   var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t'];
   var ending = false;
-  var currentTile = gameData.activeTiles[0].Y;
+  var currentTile = gameData.activeTiles[0];
   var currentTileIndex = findFirstIndexFromArray(alphabet,currentTile);
   var nextTile = alphabet[currentTileIndex + 1];
   for (let i = 0; i < gameData.activeTiles.length; i++) {
-    currentTile = gameData.activeTiles[i].Y;
-    currentTileIndex = findFirstIndexFromArray(alphabet,currentTile);
+    currentTile = gameData.activeTiles[i];
+    currentTileIndex = findFirstIndexFromArray(alphabet,currentTile.Y);
     nextTile = alphabet[currentTileIndex + 1]
-    if (findStaticTiles(nextTile) || gameData.activeTiles[i].Y === 't'){
+    if (findStaticTiles(currentTile.X,nextTile) || gameData.activeTiles[i].Y === 't'){
       ending = true;
     }
   }
@@ -90,9 +123,9 @@ var findFirstIndexFromArray = function(array, variable) {
   }
 }
 
-var findStaticTiles = function (Y) {
+var findStaticTiles = function (X,Y) {
   for (let i = 0; i < gameData.staticTiles.length; i++) {
-    if (Y === gameData.staticTiles[i].Y) {
+    if (Y === gameData.staticTiles[i].Y && X === gameData.staticTiles[i].X) {
       return true;
     }
   }
