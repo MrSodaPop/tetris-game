@@ -57,7 +57,9 @@ var moveTetrominoe = function(direction) {
       $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).removeClass('active')
       $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).removeClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
       gameData.activeTiles[i].X++;
-      $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('active')
+    }
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+            $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('active')
       $('#' + gameData.activeTiles[i].X + gameData.activeTiles[i].Y).addClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
     }
   }
