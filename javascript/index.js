@@ -5,28 +5,32 @@ $(document).ready(function() {
     generateTetrominoe();
     gameTick();
 
-    // $('html').keypress(function(key){
-    //   switch (key.keyCode) {
-    //     case 13: if (gameData.activeTetrominoe){return}else{generateTetrominoe()} break;
-    //     default: console.log('invalid key');
-    //   }
-    // })
+    $('html').keypress(function(key){
+      switch (key.keyCode) {
+        case 13: if (gameData.activeTetrominoe){return}else{generateTetrominoe()} break;
+        default: console.log('invalid key');
+      }
+    })
 });
 
 var gameTick = function() {
   gameData.lastTick = Date.now();
   var tick = setInterval(function(){
     gameUpdate()
+    if(findStaticTiles('a')) {
+      $('#score').append('GAMEOVER');
+      clearInterval(tick)
+    }
   },1)
 }
 
 var gameUpdate = function() {
   if (Date.now() - gameData.lastTick > gameData.tickrate) {
-    console.log('tick')
     gameData.lastTick = Date.now();
     if (gameData.activeTetrominoe) {
       moveTetrominoe();
     }
+    
   }
 };
 
@@ -41,21 +45,31 @@ var generateGameArea = function() {
 }
 
 var moveTetrominoe = function() {
-  console.log('moving')
   var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t'];
   var ending = false;
+  var currentTile = gameData.activeTiles[0].Y;
+  var currentTileIndex = findFirstIndexFromArray(alphabet,currentTile);
+  var nextTile = alphabet[currentTileIndex + 1];
   for (let i = 0; i < gameData.activeTiles.length; i++) {
-    if (gameData.activeTiles[i].Y === findStaticTiles(alphabet[findFirstIndexFromArray(alphabet,gameData.activeTiles[i].Y)+1]) || gameData.activeTiles[i].Y === 't'){
-      for (let u = 0; u < gameData.activeTiles.length; i++) {
-        $('#' + String(gameData.activeTiles[u].X) + String(gameData.activeTiles[u].Y)).addClass('static');
-        $('#' + String(gameData.activeTiles[u].X) + String(gameData.activeTiles[u].Y)).removeClass('active');
-      }
-        gameData.activeTiles = [{Y:null,X:null},{Y:null,X:null},{Y:null,X:null},{Y:null,X:null}];
-        gameData.activeTetrominoe = false;
-        ending = true;
+    currentTile = gameData.activeTiles[i].Y;
+    currentTileIndex = findFirstIndexFromArray(alphabet,currentTile);
+    nextTile = alphabet[currentTileIndex + 1]
+    if (findStaticTiles(nextTile) || gameData.activeTiles[i].Y === 't'){
+      ending = true;
     }
   }
-  if (!ending) {
+  if (ending) {
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('static');
+      $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('active');
+    }
+    for (let i = 0; i < gameData.activeTiles.length; i++) {
+      addTileToStatic(gameData.activeTiles[i]);
+    }
+      gameData.activeTiles = [{Y:null,X:null},{Y:null,X:null},{Y:null,X:null},{Y:null,X:null}];
+      gameData.activeTetrominoe = false;
+  }
+  else {
     for (let i = 0; i < gameData.activeTiles.length; i++) {
       $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
       $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).removeClass('active');
@@ -79,17 +93,32 @@ var findFirstIndexFromArray = function(array, variable) {
 var findStaticTiles = function (Y) {
   for (let i = 0; i < gameData.staticTiles.length; i++) {
     if (Y === gameData.staticTiles[i].Y) {
-      return i;
+      return true;
+    }
+  }
+  return false;
+}
+
+var addTileToStatic = function (tile) {
+  console.log('adding to static')
+  var flag = false;
+  var counter = 0;
+  while (!flag) {
+    if (gameData.staticTiles[counter].Y === null) {
+      gameData.staticTiles[counter].Y = tile.Y
+      gameData.staticTiles[counter].X = tile.X
+      flag = true;
+    }
+    else {
+      counter++
     }
   }
 }
 
 var generateTetrominoe = function() {
-    console.log('generating')
     gameData.activeTetrominoeShape = Math.floor(Math.random()*7)
     var currentTetrominoe = gameData.tetrominoeConfigurations[gameData.activeTetrominoeShape];
     var currentTile = currentTetrominoe[0]
-    console.log(currentTetrominoe);
     for (let i = 0; i < 4; i++) {
       currentTile = parseInt(currentTetrominoe[i])
       if (currentTile > 4) {
@@ -100,7 +129,6 @@ var generateTetrominoe = function() {
         gameData.activeTiles[i].Y = 'a';
         gameData.activeTiles[i].X = currentTile + 2;
       }
-      console.log('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y))
       $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('tetrominoe-' + gameData.tetrominoeShapes[gameData.activeTetrominoeShape]);
       $('#' + String(gameData.activeTiles[i].X) + String(gameData.activeTiles[i].Y)).addClass('active');
     }
